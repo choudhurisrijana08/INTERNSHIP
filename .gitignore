@@ -1,0 +1,7 @@
+LUXER/
+backend/
+build/
+node_modules/
+public/
+src/
+...

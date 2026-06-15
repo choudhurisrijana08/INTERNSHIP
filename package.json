@@ -1,0 +1,37 @@
+{
+  "name": "shopkart-registration",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ShopKart e-commerce registration page — React",
+  "scripts": {
+    "start": "react-scripts start",
+    "dev": "react-scripts start",
+    "backend": "npm --prefix backend start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "proxy": "http://localhost:4000",
+  "dependencies": {
+    "firebase": "^10.14.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^2.15.4"
+  },
+  "devDependencies": {
+    "eslint-plugin-react-hooks": "^4.6.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
