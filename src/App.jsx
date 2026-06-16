@@ -94,8 +94,55 @@ export default function App() {
     const minR = parseFloat(ratingFilter) || 0;
     const query = searchQuery.toLowerCase().trim();
 
+    const normalizedSelectedRaw = (catFilter || '').trim().toLowerCase();
+
+    // Firestore stores categories like: "Men's Fashion", "Home & Living"
+    // UI/state sometimes provides simpler values like: "Men", "Women", "Home"
+    const selectedCatMappedNormalized = (() => {
+      const v = normalizedSelectedRaw;
+      const map = {
+        men: "men's fashion",
+        "womens": "women's fashion",
+        women: "women's fashion",
+        home: 'home & living',
+      };
+      return map[v] || v;
+    })();
+
+    let filteredOutByCategoryCount = 0;
     const list = products.filter(p => {
-      if (catFilter !== 'all' && p.cat !== catFilter) return false;
+      if (catFilter !== 'all') {
+        const productCatRaw = p.cat;
+        const productCategoryRaw = p.cat || p.category;
+
+        const productCategory = ((productCatRaw || p.category) || '').trim().toLowerCase();
+
+        const selectedCategory = (selectedCatMappedNormalized || '').trim().toLowerCase();
+
+        const isMatch = productCategory === selectedCategory;
+
+        if (!isMatch) {
+          filteredOutByCategoryCount += 1;
+          console.log('[Category Filter:Mismatch]', {
+            selectedCategoryRaw: catFilter,
+            selectedCategoryNormalized: selectedCategory,
+            'product.cat': productCatRaw,
+            'product.category': p.category,
+            productCategoryNormalized: productCategory,
+            reason: 'normalized string mismatch (trim/lower + optional mapping)',
+          });
+          return false;
+        }
+
+        console.log('[Category Filter:Match]', {
+          selectedCategoryRaw: catFilter,
+          selectedCategoryNormalized: selectedCategory,
+          'product.cat': productCatRaw,
+          'product.category': p.category,
+          productCategoryNormalized: productCategory,
+        });
+      }
+
       if (p.price < minP || p.price > maxP) return false;
       if (p.rating < minR) return false;
       if (filterSale && !p.oldPrice) return false;
@@ -104,11 +151,21 @@ export default function App() {
       return true;
     });
 
+    console.log('[Category Filter:Summary]', {
+      catFilter,
+      selectedCatMappedNormalized,
+      totalProducts: products.length,
+      filteredProductsCount: list.length,
+      filteredOutByCategoryCount,
+    });
+
+
     if (sortOption === 'price-low') return list.sort((a, b) => a.price - b.price);
     if (sortOption === 'price-high') return list.sort((a, b) => b.price - a.price);
     if (sortOption === 'rating') return list.sort((a, b) => b.rating - a.rating);
     return list;
   }, [catFilter, filterInStock, filterSale, priceMax, priceMin, ratingFilter, searchQuery, sortOption]);
+
 
   const cartQuantity = cart.reduce((sum, item) => sum + item.qty, 0);
   const wishlistCount = wishlist.length;
