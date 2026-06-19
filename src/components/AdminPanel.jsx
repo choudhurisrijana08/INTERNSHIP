@@ -59,11 +59,14 @@ export default function AdminPanel({
     loadAdminData();
   }, []);
 
+  const API_BASE_URL = "https://internship2-b9gm.onrender.com";
+
   useEffect(() => {
     if (!currentUser?.email) return;
+
     async function refreshUsers() {
       try {
-        const res = await fetch('/api/users');
+        const res = await fetch(`${API_BASE_URL}/api/users`);
         if (!res.ok) throw new Error('network');
         const data = await res.json();
         setUsersList(data);
@@ -78,7 +81,7 @@ export default function AdminPanel({
     if (adminTab !== 'users') return;
     async function refreshUsersTab() {
       try {
-        const res = await fetch('/api/users');
+        const res = await fetch(`${API_BASE_URL}/api/users`);
         if (!res.ok) throw new Error('network');
         const data = await res.json();
         setUsersList(data);
@@ -88,6 +91,7 @@ export default function AdminPanel({
     }
     refreshUsersTab();
   }, [adminTab]);
+
 
   async function fetchProducts() {
     try {
@@ -826,7 +830,11 @@ export default function AdminPanel({
                 <ProductForm
                   initial={{ name: '', cat: '', price: 0, stock: 0, inStock: true, rating: 4.0, description: '' }}
                   onCancel={() => setShowAddModal(false)}
-                  onSubmit={async (vals) => { await addProductAPI(vals); setShowAddModal(false); }}
+                  onSubmit={async (vals) => {
+                    await addProductAPI(vals);
+                    setShowAddModal(false);
+                  }}
+                  showToast={showToast}
                 />
               </div>
             </div>
@@ -838,8 +846,16 @@ export default function AdminPanel({
                 <h3>Edit Product</h3>
                 <ProductForm
                   initial={editProduct}
-                  onCancel={() => { setShowEditModal(false); setEditProduct(null); }}
-                  onSubmit={async (vals) => { await updateProductAPI(editProduct.id, vals); setShowEditModal(false); setEditProduct(null); }}
+                  onCancel={() => {
+                    setShowEditModal(false);
+                    setEditProduct(null);
+                  }}
+                  onSubmit={async (vals) => {
+                    await updateProductAPI(editProduct.id, vals);
+                    setShowEditModal(false);
+                    setEditProduct(null);
+                  }}
+                  showToast={showToast}
                 />
               </div>
             </div>
@@ -1438,8 +1454,9 @@ function ProductForm({ initial, onCancel, onSubmit, showToast }) {
 
       const form = new FormData();
       form.append('image', file);
+      const API_BASE_URL = "https://internship2-b9gm.onrender.com";
 
-      const res = await fetch('/api/upload', {
+      const res = await fetch(`${API_BASE_URL}/api/upload`, {
         method: 'POST',
         body: form,
       });
