@@ -63,13 +63,29 @@
       "status": "Processing",
       "date": "Jun 15, 2026",
       "id": 4
+    },
+    {
+      "customer": "Srijana Choudhuri",
+      "email": "nirajverma@gail.com",
+      "items": [
+        {
+          "name": "kurti",
+          "qty": 1,
+          "price": 4555
+        }
+      ],
+      "amount": "₹4,555",
+      "total": 4555,
+      "status": "Processing",
+      "date": "Jun 16, 2026",
+      "id": 5
     }
   ],
   "users": [
     {
       "id": 1,
       "status": "Active",
-      "joined": "2026-06-16",
+      "joined": "2026-06-19",
       "name": "admin@luxe.com",
       "email": "admin@luxe.com"
     },
@@ -86,6 +102,13 @@
       "joined": "2026-06-07",
       "name": "Diploma Engineering",
       "email": "niraj021@gmail.com"
+    },
+    {
+      "id": 4,
+      "status": "Active",
+      "joined": "2026-06-16",
+      "name": "Srijana Choudhuri",
+      "email": "nirajverma@gail.com"
     }
   ]
 }

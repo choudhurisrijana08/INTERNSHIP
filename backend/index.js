@@ -29,7 +29,7 @@ app.use(express.json());
 const file = join(__dirname, 'db.json');
 
 const adapter = new JSONFile(file);
-const defaultData = { orders: [], users: [] };
+const defaultData = { orders: [], users: [], products: [] };
 const db = new Low(adapter, defaultData);
 
 async function initDB() {
@@ -39,8 +39,10 @@ async function initDB() {
   // Keep endpoints working with empty arrays until real data is created.
   db.data.orders = Array.isArray(db.data.orders) ? db.data.orders : [];
   db.data.users = Array.isArray(db.data.users) ? db.data.users : [];
+  db.data.products = Array.isArray(db.data.products) ? db.data.products : [];
   await db.write();
 }
+
 
 initDB();
 
@@ -74,7 +76,52 @@ app.get('/api/users', async (req, res) => {
   res.json(db.data.users || []);
 });
 
+// Products API (for frontend admin/product management)
+app.get('/api/products', async (req, res) => {
+  await db.read();
+  res.json(db.data.products || []);
+});
+
+app.post('/api/products', async (req, res) => {
+  const product = req.body;
+  await db.read();
+
+  const nextId = (db.data.products.reduce((m, p) => Math.max(m, p.id || 0), 0) || 0) + 1;
+  product.id = nextId;
+  db.data.products.push(product);
+  await db.write();
+  res.status(201).json(product);
+});
+
+app.put('/api/products/:id', async (req, res) => {
+  const id = req.params.id;
+  const updates = req.body;
+
+  await db.read();
+  const existing = db.data.products.find((p) => String(p.id) === String(id));
+  if (!existing) return res.status(404).json({ error: 'Product not found' });
+
+  const updated = { ...existing, ...updates, id: existing.id };
+  db.data.products = db.data.products.map((p) => (String(p.id) === String(id) ? updated : p));
+  await db.write();
+  res.json(updated);
+});
+
+app.delete('/api/products/:id', async (req, res) => {
+  const id = req.params.id;
+
+  await db.read();
+  const before = db.data.products.length;
+  db.data.products = (db.data.products || []).filter((p) => String(p.id) !== String(id));
+  const after = db.data.products.length;
+
+  if (after === before) return res.status(404).json({ error: 'Product not found' });
+  await db.write();
+  res.json({ ok: true });
+});
+
 // Cloudinary upload endpoint
+
 app.post('/api/upload', multer({ storage: multer.memoryStorage() }).single('image'), async (req, res) => {
   const requestId = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   try {
