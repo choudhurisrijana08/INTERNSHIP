@@ -22,6 +22,10 @@ const { Readable } = require('stream');
 
 const app = express();
 app.use(cors());
+app.get("/", (req, res) => {
+  res.send("Backend API is running");
+});
+
 app.use(express.json());
 
 // Image uploads (multipart/form-data) are handled by multer route middleware.
